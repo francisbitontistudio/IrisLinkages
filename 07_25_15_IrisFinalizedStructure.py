@@ -9,9 +9,14 @@ rows = rs.GetInteger("Number of rows", 2, 2)
 # Get the number of columns
 cols = rs.GetInteger("Number of columns", 2, 2)
 
+ref=rs.GetObject("please select reference curve",rs.filter.curve)
 joint= rs.GetObject("please select joint geometry",rs.filter.polysurface)
+<<<<<<< HEAD
 arm=rs.GetObject("please select arm geometry",rs.filter.polysurface)
 ref=rs.GetObject("please select reference curve",rs.filter.curve)
+=======
+arm=rs.GetObject("please select arm geometry"),rs.filter.polysurface)
+>>>>>>> origin/master
 link=rs.GetObject("please select link geometry")
 gap=rs.GetReal("please indicate the spacing between arms in section")
 holeRad=rs.GetReal("please indicate the hole width for link input")
@@ -22,10 +27,28 @@ def attachLinks(link,crvs,pts,ref):
     for i in range(len(crvs)):
         pts.append(rs.CurveEndPoint(crvs[i]))
         pts.append(rs.CurveStartPoint(crvs[i]))
+    pts=removeDup(pts)
     for i in range(len(pts)):
         links.append(rs.CopyObject(link,rs.VectorCreate(pts[i],rs.CurveStartPoint(ref))))
     return links
 
+def removeDup(freePts):
+    pts=[]
+    for i in range(len(freePts)):
+        pts.append(freePts[i])
+    for i in range(len(pts)):
+        count=0
+        dup=True
+        while dup==True:
+            index=freePts.index(pts[i])
+            test=freePts.pop(freePts.index(pts[i]))
+            if pts[i] in freePts:
+                freePts.pop(freePts.index(pts[i]))
+            if not pts[i] in freePts:
+                freePts.insert(index,pts[i])
+                dup=False
+    print len(freePts)
+    return freePts
 
 def ArrayPointsOnSurface(srf,rows,cols):
     lines=[]
