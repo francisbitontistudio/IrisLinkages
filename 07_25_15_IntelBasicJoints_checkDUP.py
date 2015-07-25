@@ -40,7 +40,8 @@ def tileCrvs(crvs,tiles,sections):
     for i in range(len(crvs)):
         for j in range(len(lines)):
             pts.append(rs.CurveCurveIntersection(crvs[i],lines[j])[0][1])
-            rs.PointAdd(pts)
+            for z in range(len(pts))
+                rs.AddPoint(pts[z])
     for i in range(len(pts)):
         if i<len(pts)-tiles-3:
             crosses.append(rs.AddLine(pts[i],pts[i+tiles+2]))
