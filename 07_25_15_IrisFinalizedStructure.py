@@ -1,22 +1,18 @@
-﻿import rhinoscriptsyntax as rs
+import rhinoscriptsyntax as rs
 import math as m
 
 
 # Get the surface object
 srf = rs.GetObject("Select surface", rs.filter.surface, True)
-if not srf: return
-
 # Get the number of rows
 rows = rs.GetInteger("Number of rows", 2, 2)
-if not rows: return
-
 # Get the number of columns
 cols = rs.GetInteger("Number of columns", 2, 2)
-if not cols: return
 
 joint= rs.GetObject("please select joint geometry",rs.filter.polysurface)
-arm=rs.GetObject("please select arm geometry"),rs.filter.polysurface)
-line=rs.GetObject("please select link geometry")
+arm=rs.GetObject("please select arm geometry",rs.filter.polysurface)
+ref=rs.GetObject("please select reference curve",rs.filter.curve)
+link=rs.GetObject("please select link geometry")
 gap=rs.GetReal("please indicate the spacing between arms in section")
 holeRad=rs.GetReal("please indicate the hole width for link input")
 
