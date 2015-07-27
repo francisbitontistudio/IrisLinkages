@@ -1,6 +1,8 @@
 ﻿import rhinoscriptsyntax as rs
 import math as m
 
+#.0625
+#.125
 
 # Get the surface object
 srf = rs.GetObject("Select surface", rs.filter.surface, True)
@@ -16,8 +18,8 @@ joint= rs.GetObject("please select joint geometry",rs.filter.polysurface)
 arm=rs.GetObject("please select arm geometry",rs.filter.polysurface)
 smallLink=rs.GetObject("please select 4-link geometry")
 bigLink=rs.GetObject("please select 2-link geometry")
-gap=rs.GetReal("please indicate the spacing between arms in section")
-holeRad=rs.GetReal("please indicate the hole width for link input")
+gap=rs.GetReal("please indicate the spacing between arms in section",0.625)
+holeRad=rs.GetReal("please indicate the hole width for link input",0.125)
 
 
 def attachLinks(bigLink,smallLink,crvs,smallPts,ref,rows):
