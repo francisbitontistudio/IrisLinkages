@@ -4,15 +4,12 @@ import math as m
 
 # Get the surface object
 srf = rs.GetObject("Select surface", rs.filter.surface, True)
-if not srf: return
 
 # Get the number of rows
 rows = rs.GetInteger("Number of rows", 2, 2)
-if not rows: return
 
 # Get the number of columns
 cols = rs.GetInteger("Number of columns", 2, 2)
-if not cols: return
 
 ref=rs.GetObject("please select reference curve",rs.filter.curve)
 joint= rs.GetObject("please select joint geometry",rs.filter.polysurface)
