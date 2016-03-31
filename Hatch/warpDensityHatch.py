@@ -20,7 +20,7 @@ def testIntersection(crv01,crv02):
 ##################################
 
 
-def genHatchX(profile,attPt,strength,ang,gap,min):
+def genHatchX(profile,attPts,strength,ang,gap,min):
     crvs = []
     hatch = []
     sections = []
@@ -45,18 +45,28 @@ def genHatchX(profile,attPt,strength,ang,gap,min):
     for i in range(int(limit/gap)):
         crvs.append(rs.CopyObject(x,vecX*i*gap))
     for i in range(len(crvs)):
-        param = rs.CurveClosestPoint(crvs[i],attPt)
-        close = rs.EvaluateCurve(crvs[i],param)
-        if rs.Distance(attPt,close)<strength*2:
+        relevant = []
+        for j in range(len(attPts)):
+            param = rs.CurveClosestPoint(crvs[i],attPts[j])
+            close = rs.EvaluateCurve(crvs[i],param)
+            if rs.Distance(attPts[j],close)<strength*2:
+                relevant.append(attPts[j])
+        if len(relevant)>0:
             divPts = rs.DivideCurve(crvs[i],20)
             for j in range(len(divPts)):
-                if rs.Distance(attPt,divPts[j])<strength:
-                    val = rs.Distance(attPt,close)/strength
-                    if val>1:
-                        val = 1
-                    if val<min:
-                        val = min
-                    vec = rs.VectorCreate(attPt,divPts[j])
+                sum = 0
+                length = 0
+                vecSum = [0,0,0]
+                for k in range(len(relevant)):
+                    attPt = relevant[k]
+                    added = rs.Distance(attPt,divPts[j])/strength
+                    if added<1:
+                        vecSum = rs.PointAdd(vecSum,rs.VectorCreate(attPt,divPts[j]))
+                        sum = sum+added
+                        length = length+1
+                if length!=0:
+                    val = 1-sum/length
+                    vec = rs.VectorScale(vecSum,val/length)
                     divPts[j]=rs.PointAdd(divPts[j],vec*(1-val))
             crv = rs.AddCurve(divPts)
             rs.DeleteObject(crvs[i])
@@ -81,7 +91,7 @@ def genHatchX(profile,attPt,strength,ang,gap,min):
 # it just uses the y axis of the bounding box as a reference
 ##################################
 
-def genHatchY(profile,attPt,strength,ang,gap,min):
+def genHatchY(profile,attPts,strength,ang,gap,min):
     crvs = []
     hatch = []
     sections = []
@@ -98,18 +108,28 @@ def genHatchY(profile,attPt,strength,ang,gap,min):
     for i in range(int(limit/gap)):
         crvs.append(rs.CopyObject(y,vecY*i*gap))
     for i in range(len(crvs)):
-        param = rs.CurveClosestPoint(crvs[i],attPt)
-        close = rs.EvaluateCurve(crvs[i],param)
-        if rs.Distance(attPt,close)<strength*2:
+        relevant = []
+        for j in range(len(attPts)):
+            param = rs.CurveClosestPoint(crvs[i],attPts[j])
+            close = rs.EvaluateCurve(crvs[i],param)
+            if rs.Distance(attPts[j],close)<strength*2:
+                relevant.append(attPts[j])
+        if len(relevant)>0:
             divPts = rs.DivideCurve(crvs[i],20)
             for j in range(len(divPts)):
-                if rs.Distance(attPt,divPts[j])<strength:
-                    val = rs.Distance(attPt,close)/strength
-                    if val>1:
-                        val = 1
-                    if val<min:
-                        val = min
-                    vec = rs.VectorCreate(attPt,divPts[j])
+                sum = 0
+                length = 0
+                vecSum = [0,0,0]
+                for k in range(len(relevant)):
+                    attPt = relevant[k]
+                    added = rs.Distance(attPt,divPts[j])/strength
+                    if added<1:
+                        vecSum = rs.PointAdd(vecSum,rs.VectorCreate(attPt,divPts[j]))
+                        sum = sum+added
+                        length = length+1
+                if length!=0:
+                    val = 1-sum/length
+                    vec = rs.VectorScale(vecSum,val/length)
                     divPts[j]=rs.PointAdd(divPts[j],vec*(1-val))
             crv = rs.AddCurve(divPts)
             rs.DeleteObject(crvs[i])
@@ -144,15 +164,15 @@ def splitCrv(profile,splitters):
 
 def Main():
     profile = rs.GetObject("select profile",rs.filter.curve)
-    attPt = rs.GetObject("select point",rs.filter.point)
+    attPts = rs.GetObjects("select points",rs.filter.point)
     angX = rs.GetReal("enter angle of hatch in first direction (degrees)", 30)
     angY = rs.GetReal("enter angle of hatch in second direction (degrees)", 40)
-    spacingX = rs.GetReal("enter desired spacing of hatch in first direction",3)
-    spacingY = rs.GetReal("enter desired spacing of hatch in second direction",3)
-    strength = rs.GetReal("enter desired range for attractor",30)
+    spacingX = rs.GetReal("enter desired spacing of hatch in first direction",6)
+    spacingY = rs.GetReal("enter desired spacing of hatch in second direction",6)
+    strength = rs.GetReal("enter desired range for attractor",40)
     minX = rs.GetReal("enter minimum spacing in first direction",.1*spacingX)
     minY = rs.GetReal("enter minimum spacing in second direction",.1*spacingY)
-    genHatchX(profile,attPt,strength,angX,spacingX,minX)
-    genHatchY(profile,attPt,strength,angY,spacingY,minY)
+    genHatchX(profile,attPts,strength,angX,spacingX,minX)
+    genHatchY(profile,attPts,strength,angY,spacingY,minY)
 
 Main()
