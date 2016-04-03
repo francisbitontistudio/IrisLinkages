@@ -113,7 +113,7 @@ def genHatchY(profile,attPts,strength,ang,gap,min):
             if rs.Distance(attPts[j],close)<strength*2:
                 relevant.append(attPts[j])
         if len(relevant)>0:
-            divPts = rs.DivideCurve(crvs[i],20)
+            divPts = rs.DivideCurve(crvs[i],30)
             for j in range(len(divPts)):
                 sum = 0
                 length = 0
