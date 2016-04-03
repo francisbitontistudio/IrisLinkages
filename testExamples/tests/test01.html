@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 
 <html>
-d
+
 <head>
     <title>Example 01.02 - First Scene</title>
     <script type="text/javascript" src="../libs/three.js"></script>
+    <script type="text/javascript" src="../libs/stats.js"></script>
+    <script type="text/javascript" src="../libs/dat.gui.js"></script>
     <style>
         body {
             /* set margin to 0 and overflow to hidden, to go fullscreen */
@@ -19,12 +21,33 @@ d
 <div id="WebGL-output">
 </div>
 
+<div id="Stats-output"></div>
+
 <!-- Javascript code that runs our Three.js examples -->
 <script type="text/javascript">
 
-    // once everything is loaded, we run our Three.js stuff.
-    function init() {
+    function initStats(){
+        var stats = new Stats();
+        stats.setMode(0);
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.left = '0px';
+        stats.domElement.style.top = '0px';
+        document.getElementById("Stats-output")
+                .appendChild(stats.domElement);
+        return stats;
+    }
 
+    var controls = new function(){
+        this.rotationSpeed = .02;
+        this.bouncingSpeed = .03;
+    }
+    // once everything is loaded, we run our Three.js stuff.
+
+    function init() {
+        var stats = initStats();
+        var gui = new dat.GUI();
+        gui.add(controls,'rotationSpeed',0,.5);
+        gui.add(controls,'bouncingSpeed',0,.5);
         // create a scene, that will hold all our elements such as objects, cameras and lights.
         var scene = new THREE.Scene();
 
@@ -33,18 +56,27 @@ d
 
         // create a render and set the size
         var renderer = new THREE.WebGLRenderer();
-        renderer.setClearColorHex();
-        renderer.setClearColor(new THREE.Color(0xEEEEEE));
+
+        //renderer.setClearColorHex();
+        renderer.setClearColor(new THREE.Color(0xEEEEEE,1.0));
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(-40,60,-10);
+        spotLight.castShadow = true;
+        spotLight.shadowDarkness = .5;
+        scene.add(spotLight);
 
         // show axes in the screen
-        var axes = new THREE.AxisHelper(20);
-        scene.add(axes);
+        //var axes = new THREE.AxisHelper(10);
+        //scene.add(axes);
 
         // create the ground plane
         var planeGeometry = new THREE.PlaneGeometry(60, 20);
-        var planeMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc});
+        var planeMaterial = new THREE.MeshLambertMaterial({color: 0xcccccc});
         var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.receiveShadow = true;
 
         // rotate and position the plane
         plane.rotation.x = -0.5 * Math.PI;
@@ -57,8 +89,9 @@ d
 
         // create a cube
         var cubeGeometry = new THREE.BoxGeometry(4, 4, 4);
-        var cubeMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
+        var cubeMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
         var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        cube.castShadow = true;
 
         // position the cube
         cube.position.x = -4;
@@ -70,13 +103,14 @@ d
 
         // create a sphere
         var sphereGeometry = new THREE.SphereGeometry(4, 20, 20);
-        var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x7777ff, wireframe: true});
+        var sphereMaterial = new THREE.MeshLambertMaterial({color: 0x7777ff});
         var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
         // position the sphere
         sphere.position.x = 20;
         sphere.position.y = 4;
         sphere.position.z = 2;
+        sphere.castShadow = true;
 
         // add the sphere to the scene
         scene.add(sphere);
@@ -87,11 +121,33 @@ d
         camera.position.z = 30;
         camera.lookAt(scene.position);
 
+        var step = 0;
+
+        function adjustSize(){
+            camera.aspect = window.innerWidth/window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth,window.innerHeight);
+        }
+
+        function renderScene(){
+            stats.update();
+            step += controls.bouncingSpeed;
+            sphere.position.x = 20+(10*(Math.cos(step)));
+            sphere.position.y = 2+(10*Math.abs(Math.sin(step)));
+            cube.rotation.x+=controls.rotationSpeed;
+            cube.rotation.y+=controls.rotationSpeed;
+            cube.rotation.z+=controls.rotationSpeed;
+            window.addEventListener("resize",adjustSize(),false);
+            requestAnimationFrame(renderScene);
+            renderer.render(scene,camera);
+        }
+
+
         // add the output of the renderer to the html element
         document.getElementById("WebGL-output").appendChild(renderer.domElement);
 
         // render the scene
-        renderer.render(scene, camera);
+        renderScene();
     }
     window.onload = init;
 
