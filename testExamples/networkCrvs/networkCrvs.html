@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Example 01.02 - First Scene</title>
+    <script type="text/javascript" src="../libs/three.js"></script>
+
+    <script type="text/javascript" src="../libs/stats.js"></script>
+    <script type="text/javascript" src="../libs/dat.gui.js"></script>
+    <script type="text/javascript" src="../libs/TrackballControls.js"></script>
+    <style>
+        body {
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<div id="Stats-output"></div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+    function initStats(){
+        var stats = new Stats();
+        stats.setMode(0);
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.left = '0px';
+        stats.domElement.style.top = '0px';
+        document.getElementById("Stats-output")
+                .appendChild(stats.domElement);
+        return stats;
+    }
+
+    var controls = new function(){
+        this.rotationSpeed = .02;
+        this.bouncingSpeed = .03;
+    }
+    // once everything is loaded, we run our Three.js stuff.
+
+    function init() {
+        var stats = initStats();
+        var gui = new dat.GUI();
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        var trackballControls = new THREE.TrackballControls(camera);
+        trackballControls.rotationSpeed = 1.0;
+        trackballControls.zoomSpeed = 1.0;
+        trackballControls.panSpeed = 1.0;
+
+        // create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+
+        //renderer.setClearColorHex();
+        renderer. setClearColor(new THREE.Color(0xEEEEEE,1.0));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+
+        // position and point the camera to the center of the scene
+        camera.position.x = -30;
+        camera.position.y = 40;
+        camera.position.z = 30;
+        camera.lookAt(scene.position);
+
+        // introduce spotlight into scene
+
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(-40,60,-10);
+        spotLight.castShadow = true;
+        spotLight.shadowDarkness = .5;
+        scene.add(spotLight);
+
+        var step = 0;
+
+        /*
+         Grid Code Starts Here
+         */
+
+        var vertex = [
+            new THREE.Vector3(0,0,0),
+            new THREE.Vector3(0,2,2),
+            new THREE.Vector3(0,0,5)
+        ];
+
+        var X = 10;
+        var Y = 10;
+        var subDiv = 12;
+        var thres = 10;
+        var gridCrvs = [];
+        var pts = [];
+        var innerPts = [];
+        var gridMat = new THREE.LineBasicMaterial({color:0x7777ff,linewidth:2});
+        var nextCrv = new THREE.Geometry();
+        var guide = new THREE.QuadraticBezierCurve3();
+        var start = new THREE.Vector3(0,0,0);
+        var mid = new THREE.Vector3(0,0,0);
+        var end = new THREE.Vector3(0,0,0);
+        var distance = new THREE.Vector3(0,0,0);
+        var closePt = new THREE.Vector3(0,0,0);
+
+        for(i=0;i<X;i++){
+            for(j=0;j<Y;j++){
+                start.addVectors(vertex[0], new THREE.Vector3(i,j,0));
+                mid.addVectors(vertex[1], new THREE.Vector3(i,j*Math.sin(i*3.14/20),0));
+                end.addVectors(vertex[2], new THREE.Vector3(i,j,0));
+                guide.v0 = start;
+                guide.v1 = mid;
+                guide.v2 = end;
+                for(k=0;k<subDiv;k++){
+                    nextCrv.vertices.push(guide.getPoint(k/subDiv));
+                }
+                cloned = nextCrv.clone();
+                newLine = new THREE.Line(cloned,gridMat);
+                scene.add(newLine);
+                gridCrvs.push(cloned);
+                nextCrv.vertices = [];
+            }
+        }
+
+        for(i=0;i<gridCrvs.length;i++){
+            var validCrvs = [];
+            pts = gridCrvs[i].vertices;
+            for(j=0;j<pts.length;j++) {
+                for(k=0;k<gridCrvs.length;k++) {
+                    if(i!=k){
+                        validCrvs.push(gridCrvs[k])
+                    }
+                }
+                closePt = pointClosestObj(validCrvs,pts[j])[1];
+                var vec = new THREE.Vector3(0,0,0);
+                vec.subVectors(closePt,pts[j]);
+                var dist = vec.length();
+                if(dist<thres){
+                    var draw = new THREE.Vector3(5,0,0);
+                    draw.subVectors(closePt,pts[j]);
+                    draw.multiplyScalar(.75);
+                    pts[j].add(draw);
+                }
+            }
+            //gridCrvs[i].vertices = pts;
+        }
+
+
+        function pointClosestPt(pts,point){
+            distance.subVectors(pts[0],point);
+            var dist = distance.length();
+            var min = dist;
+            var index = 0;
+            for(i=0;i<pts.length;i++){
+                distance.subVectors(pts[i],point);
+                dist = distance.length();
+                if(dist<min){
+                    min = dist;
+                    index = i;
+                }
+            }
+            return index;
+        }
+
+        function pointClosestObj(objs,point) {
+            var index = 0;
+            var objIndex = 0;
+            var pts = [];
+            for(i=0;i<objs.length;i++){
+                index = pointClosestPt(objs[i].vertices,point);
+                pts.push(objs[i].vertices[index]);
+            }
+            objIndex = pointClosestPt(pts,point);
+            return [objIndex,pts[objIndex]]
+        }
+
+        function adjustSize(){
+            camera.aspect = window.innerWidth/window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth,window.innerHeight);
+        }
+
+        var clock = new THREE.Clock();
+
+        function renderScene(){
+            var delta = clock.getDelta();
+            trackballControls.update(delta);
+            stats.update();
+            window.addEventListener("resize",adjustSize(),false);
+            requestAnimationFrame(renderScene);
+            renderer.render(scene,camera);
+        }
+
+
+        // add the output of the renderer to the html element
+        document.getElementById("WebGL-output").appendChild(renderer.domElement);
+
+        // render the scene
+        renderScene();
+    }
+    window.onload = init;
+
+</script>
+</body>
+</html>

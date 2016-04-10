@@ -78,8 +78,8 @@ def genHatchX(profile,attPts,strength,ang,gap,min):
     #see if they lie within the profile (by looking at their midpoint)
     for i in range(len(sections)):
         for j in range(len(sections[i])):
-            #if rs.PointInPlanarClosedCurve(rs.CurveMidPoint(sections[i][j]),profile)==False:
-            #    rs.DeleteObject(sections[i][j])
+            if rs.PointInPlanarClosedCurve(rs.CurveMidPoint(sections[i][j]),profile)==False:
+                rs.DeleteObject(sections[i][j])
             hatch.append(sections[i][j])
     rs.DeleteObject(x)
     return crvs

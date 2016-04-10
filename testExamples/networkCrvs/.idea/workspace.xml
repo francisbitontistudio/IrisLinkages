@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="48ebaad0-d057-4510-853d-c435bc507521" name="Default" comment="" />
-    <ignored path="testExamples.iws" />
+    <list default="true" id="0c862e5c-acf5-43d8-b2ac-4a85785aa68d" name="Default" comment="" />
+    <ignored path="networkCrvs.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,15 +17,15 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FavoritesManager">
-    <favorites_list name="testExamples" />
+    <favorites_list name="networkCrvs" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="02-first-scene.html" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../learning-threejs/chapter-01/02-first-scene.html">
+      <file leaf-file-name="networkCrvs.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/networkCrvs.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="9" column="21" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
+            <state relative-caret-position="289">
+              <caret line="176" column="49" selection-start-line="176" selection-start-column="49" selection-end-line="176" selection-end-column="49" />
               <folding />
             </state>
           </provider>
@@ -33,10 +33,17 @@
       </file>
     </leaf>
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/firstTest.html" />
+        <option value="$PROJECT_DIR$/networkCrvs.html" />
       </list>
     </option>
   </component>
@@ -46,8 +53,9 @@
     <detection-done>true</detection-done>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="308" />
-    <option name="width" value="1020" />
+    <option name="x" value="190" />
+    <option name="y" value="16" />
+    <option name="width" value="1104" />
     <option name="height" value="768" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
@@ -79,7 +87,7 @@
         <subPane>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="testExamples" />
+              <option name="myItemId" value="networkCrvs" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -92,11 +100,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\pwild\Documents\GitHub\learning-threejs\chapter-01" />
-    </key>
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
@@ -161,23 +165,22 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="48ebaad0-d057-4510-853d-c435bc507521" name="Default" comment="" />
-      <created>1459709849209</created>
+      <changelist id="0c862e5c-acf5-43d8-b2ac-4a85785aa68d" name="Default" comment="" />
+      <created>1460247880289</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1459709849209</updated>
-      <workItem from="1459709850546" duration="114000" />
-      <workItem from="1459710054443" duration="407000" />
-      <workItem from="1459710487956" duration="171000" />
+      <updated>1460247880289</updated>
+      <workItem from="1460247881513" duration="5580000" />
+      <workItem from="1460253495765" duration="31000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="692000" />
+    <option name="totallyTimeSpent" value="5611000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="308" y="0" width="1020" height="768" extended-state="0" />
-    <editor active="true" />
+    <frame x="190" y="16" width="1104" height="768" extended-state="0" />
+    <editor active="false" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -213,7 +216,7 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../learning-threejs/chapter-01/02-first-scene.html">
+    <entry file="file://$PROJECT_DIR$/networkCrvs.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -221,18 +224,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/firstTest.html">
+    <entry file="file://$PROJECT_DIR$/../basicFunctions/findClosestPoint.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="29" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
-          <folding />
+        <state relative-caret-position="507">
+          <caret line="179" column="7" selection-start-line="0" selection-start-column="0" selection-end-line="179" selection-end-column="7" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../learning-threejs/chapter-01/02-first-scene.html">
+    <entry file="file://$PROJECT_DIR$/networkCrvs.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="21" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
+        <state relative-caret-position="289">
+          <caret line="176" column="49" selection-start-line="176" selection-start-column="49" selection-end-line="176" selection-end-column="49" />
           <folding />
         </state>
       </provider>
