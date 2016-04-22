@@ -20,7 +20,7 @@ def testIntersection(crv01,crv02):
 ##################################
 
 
-def genHatchX(profile,attPts,strength,ang,gap,min):
+def genHatchX(profile,attPts,varyPts,strength,strVary,ang,gap,min,varyMin):
     crvs = []
     hatch = []
     sections = []
@@ -42,8 +42,23 @@ def genHatchX(profile,attPts,strength,ang,gap,min):
     limit = numX+rs.Distance(box[0],box[1])
     #the for loop below copies each curve down to profile
     crv = x
-    for i in range(int(limit/gap)):
-        crvs.append(rs.CopyObject(x,vecX*i*gap))
+    copy = 0
+    while copy<limit:
+        sum = 0
+        for i in range(len(varyPts)):
+            param = rs.CurveClosestPoint(crv,varyPts[i])
+            close = rs.EvaluateCurve(crv,param)
+            sum = rs.Distance(varyPts[i],close)+sum
+        val = sum/(len(varyPts)*strVary)
+        if val>1:
+            val = 1
+        if val<varyMin:
+            val = varyMin
+        copy = copy+val*gap
+        crv = rs.CopyObject(x,copy*vecX)
+        crvs.append(crv)
+    #for i in range(int(limit/gap)):
+    #    crvs.append(rs.CopyObject(x,vecX*i*gap))
     for i in range(len(crvs)):
         relevant = []
         for j in range(len(attPts)):
@@ -67,12 +82,8 @@ def genHatchX(profile,attPts,strength,ang,gap,min):
                 if length!=0:
                     val = 1-sum/length
                     vec = rs.VectorScale(vecSum,val/length)
-<<<<<<< HEAD
-                    if j!=0 or j!=len(divPts)-1:
-=======
                     if j!=0 and j!=len(divPts)-1:
->>>>>>> 59bfeb7955d50ab4cce208edcc2e618bf867223a
-                        divPts[j]=rs.PointAdd(divPts[j],vec*(1-val))
+                        divPts[j]=rs.PointAdd(divPts[j],-vec*(1-val))
             crv = rs.AddCurve(divPts)
             rs.DeleteObject(crvs[i])
             crvs[i] = crv
@@ -93,10 +104,11 @@ def genHatchX(profile,attPts,strength,ang,gap,min):
 # it just uses the y axis of the bounding box as a reference
 ##################################
 
-def genHatchY(profile,attPts,strength,ang,gap,min):
+def genHatchY(profile,attPts,varyPts,strength,strVary,ang,gap,min,varyMin):
     crvs = []
     hatch = []
     sections = []
+    varyMin = .25
     box = rs.BoundingBox(profile)
     start = rs.CurveStartPoint(profile)
     vecY = rs.VectorUnitize(rs.VectorCreate(box[3],box[0]))
@@ -107,8 +119,21 @@ def genHatchY(profile,attPts,strength,ang,gap,min):
     y = rs.MoveObject(y,correct)
     limit=numY+rs.Distance(box[0],box[3])
     crv = y
-    for i in range(int(limit/gap)):
-        crvs.append(rs.CopyObject(y,vecY*i*gap))
+    copy = 0
+    while copy<limit:
+        sum = 0
+        for i in range(len(varyPts)):
+            param = rs.CurveClosestPoint(crv,varyPts[i])
+            close = rs.EvaluateCurve(crv,param)
+            sum = rs.Distance(varyPts[i],close)+sum
+        val = sum/(len(varyPts)*strVary)
+        if val>1:
+            val = 1
+        if val<varyMin*2:
+            val = varyMin*2
+        copy = copy+val*gap
+        crv = rs.CopyObject(y,copy*vecY)
+        crvs.append(crv)
     for i in range(len(crvs)):
         relevant = []
         for j in range(len(attPts)):
@@ -117,10 +142,7 @@ def genHatchY(profile,attPts,strength,ang,gap,min):
             if rs.Distance(attPts[j],close)<strength*2:
                 relevant.append(attPts[j])
         if len(relevant)>0:
-<<<<<<< HEAD
-=======
             divPts = rs.DivideCurve(crvs[i],30)
->>>>>>> 59bfeb7955d50ab4cce208edcc2e618bf867223a
             for j in range(len(divPts)):
                 sum = 0
                 length = 0
@@ -135,15 +157,8 @@ def genHatchY(profile,attPts,strength,ang,gap,min):
                 if length!=0:
                     val = 1-sum/length
                     vec = rs.VectorScale(vecSum,val/length)
-<<<<<<< HEAD
-                    if j!=0 or j!=len(divPts)-1:
-                        divPts[j]=rs.PointAdd(divPts[j],vec*(1-val))
-                        if length>1:
-                            print divPts
-=======
                     if j!=0 and j!=len(divPts)-1:
-                        divPts[j]=rs.PointAdd(divPts[j],vec*(1-val))
->>>>>>> 59bfeb7955d50ab4cce208edcc2e618bf867223a
+                        divPts[j]=rs.PointAdd(divPts[j],-vec*(1-val))
             crv = rs.AddCurve(divPts)
             rs.DeleteObject(crvs[i])
             crvs[i] = crv
@@ -169,21 +184,23 @@ def splitCrv(profile,splitters):
             for j in range(len(intersect)):
                 params.append(intersect[j][5])
             #splits the profile curve at those parameters
-            sects = rs.SplitCurve(profile,params)
+            sects = rs.SplitCurve(profile,params,True)
     return sects
 
 def Main():
     profile = rs.GetObject("select profile",rs.filter.curve)
-    attPts = rs.GetObjects("select points",rs.filter.point)
+    attPts = rs.GetObjects("select warp hatch pts",rs.filter.point)
+    varyPts = rs.GetObjects("slect vary hatch pts",rs.filter.point)
     angX = rs.GetReal("enter angle of hatch in first direction (degrees)", 30)
     angY = rs.GetReal("enter angle of hatch in second direction (degrees)", 40)
     spacingX = rs.GetReal("enter desired spacing of hatch in first direction",5)
     spacingY = rs.GetReal("enter desired spacing of hatch in second direction",6)
-    strength = rs.GetReal("enter desired range for attractor",90)
-    
-    minX = rs.GetReal("enter minimum spacing in first direction",.1*spacingX)
-    minY = rs.GetReal("enter minimum spacing in second direction",.1*spacingY)
-    genHatchX(profile,attPts,strength,angX,spacingX,minX)
-    genHatchY(profile,attPts,strength,angY,spacingY,minY)
+    strength = rs.GetReal("enter desired range for warp",50)
+    strVary = rs.GetReal("enter desired range for vary",25)
+    minX = rs.GetReal("enter minimum warp spacing in first direction",.1*spacingX)
+    minY = rs.GetReal("enter minimum warp spacing in second direction",.1*spacingY)
+    varyMin = rs.GetReal("enter minimum grid spacing",.5)
+    genHatchX(profile,attPts,varyPts,strength,strVary,angX,spacingX,minX,varyMin)
+    genHatchY(profile,attPts,varyPts,strength,strVary,angY,spacingY,minY,varyMin)
 
 Main()
