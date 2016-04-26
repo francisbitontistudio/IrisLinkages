@@ -31,15 +31,21 @@ def genHatchX(profile,ang,space):
     #NUMX is the req. distance to move the end point of the line to form
     #the correct angle of the hatch
     numX = rs.Distance(box[0],box[3])*m.tan(ang*m.pi/180)
-    axisX = rs.PointAdd(box[3],-vecX*numX)
+    if ang<0:
+        axisX = rs.PointAdd(box[0],vecX*numX)
+        axisXSt = box[3]
+        max = numX+rs.Distance(box[0],box[1])
+    else:
+        axisX = rs.PointAdd(box[3],-vecX*numX)
+        axisXSt = box[0]
+        max = numX+rs.Distance(box[0],box[1])
     #X is the first hatch line that will be copied to cover profile
-    x = rs.AddCurve([box[0],axisX],1)
+    x = rs.AddCurve([axisXSt,axisX],1)
     #CORRECT lifts the hatch line to the height of the profile
     correct = [0,0,start[2]-box[0][2]]
     x = rs.MoveObject(x,correct)
     #MAX is the dimension that the hatch will have to move over to cover
     #entire profile
-    max = numX+rs.Distance(box[0],box[1])
     #the for loop below copies each curve down to profile
     for i in range(int(max/space)):
         crvs.append(rs.CopyObject(x,vecX*i*space))
@@ -54,8 +60,8 @@ def genHatchX(profile,ang,space):
             else:
                 rs.DeleteObject(sections[i][j])
             hatch.append(sections[i][j])
-    rs.DeleteObjects(crvs)
-    rs.DeleteObject(x)
+    #rs.DeleteObjects(crvs)
+    #rs.DeleteObject(x)
     return crvs
 
 ##################################
@@ -108,10 +114,10 @@ def splitCrv(profile,splitters):
 
 def Main():
     profile = rs.GetObject("select profile",rs.filter.curve)
-    angX = rs.GetReal("enter angle of hatch in first direction (degrees)", 45)
+    angX = rs.GetReal("enter angle of hatch in first direction (degrees)", -54)
     angY = rs.GetReal("enter angle of hatch in second direction (degrees)", 45)
-    spacingX = rs.GetReal("enter desired spacing of hatch in first direction",1)
-    spacingY = rs.GetReal("enter desired spacing of hatch in second direction",1)
+    spacingX = rs.GetReal("enter desired spacing of hatch in first direction",.5)
+    spacingY = rs.GetReal("enter desired spacing of hatch in second direction",20)
     genHatchX(profile,angX,spacingX)
     genHatchY(profile,angY,spacingY)
 
