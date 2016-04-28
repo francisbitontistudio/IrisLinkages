@@ -109,77 +109,7 @@
         var distance = new THREE.Vector3(0,0,0);
         var closePt = new THREE.Vector3(0,0,0);
 
-        for(i=0;i<X;i++){
-            for(j=0;j<Y;j++){
-                start.addVectors(vertex[0], new THREE.Vector3(i,j,0));
-                mid.addVectors(vertex[1], new THREE.Vector3(i,j*Math.sin(i*3.14/20),0));
-                end.addVectors(vertex[2], new THREE.Vector3(i,j,0));
-                guide.v0 = start;
-                guide.v1 = mid;
-                guide.v2 = end;
-                for(k=0;k<subDiv;k++){
-                    nextCrv.vertices.push(guide.getPoint(k/subDiv));
-                }
-                cloned = nextCrv.clone();
-                newLine = new THREE.Line(cloned,gridMat);
-                scene.add(newLine);
-                gridCrvs.push(cloned);
-                nextCrv.vertices = [];
-            }
-        }
 
-        for(i=0;i<gridCrvs.length;i++){
-            var validCrvs = [];
-            pts = gridCrvs[i].vertices;
-            for(j=0;j<pts.length;j++) {
-                validCrvs = [];
-                for(k=0;k<gridCrvs.length;k++) {
-                    if(i!=k){
-                        validCrvs.push(gridCrvs[k])
-                    }
-                }
-                closePt = pointClosestObj(validCrvs,pts[j])[1];
-                var vec = new THREE.Vector3(0,0,0);
-                vec.subVectors(closePt,pts[j]);
-                var dist = vec.length();
-                if(dist<thres){
-                    var draw = new THREE.Vector3(5,0,0);
-                    draw.subVectors(closePt,pts[j]);
-                    draw.multiplyScalar(.75);
-                    pts[j].add(draw);
-                }
-            }
-            //gridCrvs[i].vertices = pts;
-        }
-
-
-        function pointClosestPt(pts,point){
-            distance.subVectors(pts[0],point);
-            var dist = distance.length();
-            var min = dist;
-            var index = 0;
-            for(i=0;i<pts.length;i++){
-                distance.subVectors(pts[i],point);
-                dist = distance.length();
-                if(dist<min){
-                    min = dist;
-                    index = i;
-                }
-            }
-            return index;
-        }
-
-        function pointClosestObj(objs,point) {
-            var index = 0;
-            var objIndex = 0;
-            var pts = [];
-            for(i=0;i<objs.length;i++){
-                index = pointClosestPt(objs[i].vertices,point);
-                pts.push(objs[i].vertices[index]);
-            }
-            objIndex = pointClosestPt(pts,point);
-            return [objIndex,pts[objIndex]]
-        }
 
         function adjustSize(){
             camera.aspect = window.innerWidth/window.innerHeight;

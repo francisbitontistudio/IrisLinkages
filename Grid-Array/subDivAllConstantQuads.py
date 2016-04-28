@@ -2,6 +2,36 @@ import rhinoscriptsyntax as rs
 import random as r
 import math as m
 
+class attractors:
+    def __init__(self,PTS,RESO,INVERT):
+        self.locs = PTS
+        self.reso = RESO
+        self.invert = INVERT
+        self.val = 1
+    def collectVal(self,pt,min,max):
+        sum = 0
+        num = 0
+        for i in range(len(self.locs)):
+            dist = rs.Distance(self.locs[i],pt)
+            if dist<self.reso:
+                sum = sum+dist
+                num = num+1
+        if num!=0:
+            val = sum/(num*self.reso)
+            if self.invert == True:
+                self.val = 1-val
+            else:
+                self.val = val
+            if val < min:
+                self.val = min
+            if val > max:
+                self.val = max
+        elif self.invert == False:
+            self.val = 1
+        elif self.invert == True:
+            self.val = 0
+        return self.val
+
 class tile:
     def __init__(self,VERTICIES,THICKNESS,HEIGHT,DIVISION):
         self.vert = VERTICIES
@@ -73,7 +103,6 @@ class tile:
     def subDivGen(self,height,cap=False,connect=True):
         meshes = []
         divTiles = self.subDiv(self.z[2])
-        print len(divTiles)
         for i in range(len(divTiles)):
             divTiles[i].div = int(self.div/2)
             print divTiles[i].div
@@ -115,13 +144,16 @@ def collectIntersections(set,cuts):
             intersectPts.append(intersect[0][1])
     return intersectPts
 
-def createTiles(sets,cuts,attPts,perfPts,container,strength):
+def createTiles(sets,cuts,structPts,perfPts,container,strength):
     pts = []
     myTiles = []
     profiles = []
-    thick = .1
+    minThick = .1
+    maxThick = .8
     height = .05
     division = 4
+    structAtt = attractors(structPts,strength,False)
+    perfAtt = attractors(perfPts,strength,False)
     for i in range(len(sets)):
         pts.append(collectIntersections(sets[i],cuts))
     for i in range(len(pts)-1):
@@ -130,50 +162,32 @@ def createTiles(sets,cuts,attPts,perfPts,container,strength):
         else:
             min = len(pts[i+1])
         for j in range(min-1):
-            myTiles.append(tile([pts[i][j],pts[i+1][j],pts[i+1][j+1],pts[i][j+1]],thick,height,division))
+            myTiles.append(tile([pts[i][j],pts[i+1][j],pts[i+1][j+1],pts[i][j+1]],minThick,height,division))
     for i in range(len(myTiles)):
         cntPt = myTiles[i].cntPt()
         if rs.IsPointInSurface(container,cntPt):
             smallTiles = []
             smallerTiles = []
             smallPerf = []
-            sum,num = 0,0
-            sumP,numP = 0,0
-            for j in range(len(attPts)):
-                if rs.Distance(cntPt,attPts[j])<strength:
-                    sum = sum + rs.Distance(cntPt,attPts[j])
-                    num = num + 1
-            for j in range(len(perfPts)):
-                if rs.Distance(cntPt,perfPts[j])<strength:
-                    sumP = sumP + rs.Distance(cntPt,perfPts[j])
-                    numP = numP + 1
-            if num!=0:
-                valSub = sum/(num*strength)
-            else:
-                valSub = 5
-            if numP!=0:
-                valPerf = sumP/(numP*strength)
-            else:
-                valPerf = .8
-            factorSub = r.random()
+            valStruct = structAtt.collectVal(cntPt,0,1)
+            valPerf = perfAtt.collectVal(cntPt,minThick,maxThick)
+            factorStruct = r.random()
             myTiles[i].thick = valPerf
-            if valSub<factorSub: 
+            if valStruct<factorStruct: 
                 smallTiles = myTiles[i].subDivGen(height)
-                if valSub<factorSub/2:
+                if valStruct<factorStruct/2:
                     for k in range(len(smallTiles)):
-                        rs.DeleteObjects(smallTiles[k].mesh)
-                        rs.DeleteObjects(myTiles[i].mesh)
-                        smallerTiles.extend(smallTiles[k].subDivGen(height))
-                    """if valSub<factorSub/3:
-                        for n in range(len(smallerTiles)):
-                            smallerTiles[n].thickness = thick*2
-                            smallerTiles[n].subDiv(height)
-                    elif valPerf<factorPerf/3:
-                        for n in range(len(smallerTiles)):
-                            smallerTiles[n].gen(False,True)
-                elif valPerf<factorPerf/2:
-                    for k in range(len(smallTiles)):
-                        smallTiles[k].gen(False,False,True)"""
+                        cntPt=smallTiles[k].cntPt()
+                        valStruct = structAtt.collectVal(cntPt,0,1)
+                        valPerf = perfAtt.collectVal(cntPt,minThick,maxThick)
+                        smallTiles[k].thick = valPerf
+                        factorStruct = r.random()
+                        if valStruct < factorStruct:
+                            rs.DeleteObjects(smallTiles[k].mesh)
+                            rs.DeleteObjects(myTiles[i].mesh)
+                            smallerTiles.extend(smallTiles[k].subDivGen(height))
+                        else:
+                            smallTiles[k].gen(False,False,True)
             else:
                 myTiles[i].gen(False,False,True)
     return profiles
@@ -181,7 +195,7 @@ def createTiles(sets,cuts,attPts,perfPts,container,strength):
 def Main():
     crvs = rs.GetObjects("please select grid curves",rs.filter.curve)
     refPt = rs.GetObject("please select reference pt",rs.filter.point)
-    attPts = rs.GetObjects("please select structural Pts",rs.filter.point)
+    structPts = rs.GetObjects("please select structural Pts",rs.filter.point)
     perfPts = rs.GetObjects("please select perforationPts",rs.filter.point)
     container = rs.GetObjects("please select containers",rs.filter.polysurface)
     strength = rs.GetReal("please enter attPt range",5)
@@ -194,11 +208,11 @@ def Main():
         vec = rs.VectorCreate(rs.CurveEndPoint(crvs[i]),rs.CurveStartPoint(crvs[i]))
         if rs.VectorAngle(vec,vecX)<1:
             crvX.append(crvs[i])
-        else:
+        else:1
             crvY.append(crvs[i])
     crvX = SortCurvesByPt(crvX,refPt)
     crvY = SortCurvesByPt(crvY,refPt)
-    createTiles(crvX,crvY,attPts,perfPts,container,strength)
+    createTiles(crvX,crvY,structPts,perfPts,container,strength)
     #rs.DeleteObjects(crvX)
     #rs.DeleteObjects(crvY)
 
