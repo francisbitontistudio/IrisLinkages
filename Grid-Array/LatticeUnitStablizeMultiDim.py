@@ -99,15 +99,9 @@ def Main():
     attPts = rs.GetObjects("select attPts",rs.filter.point)
     box = rs.BoundingBox(objs)
     dim = 6
-<<<<<<< HEAD
-    nX = rs.GetInteger("please enter number in x" ,40)
-    nY = rs.GetInteger("please enter number in y",16)
-    nZ = rs.GetInteger("please enter number in z",20)
-=======
     nX = rs.GetInteger("please enter number in x" ,14)
     nY = rs.GetInteger("please enter number in y",3)
     nZ = rs.GetInteger("please enter number in z",6)
->>>>>>> b3ff1e34be6a6d2d1dc3dee068777df9876d85af
     X = rs.GetReal("please enter x axis spacing",rs.Distance(box[1],box[0]))
     Y = rs.GetReal("please enter y axis spacing",rs.Distance(box[0],box[3]))
     Z = rs.GetReal("please enter z axis spacing",rs.Distance(box[0],box[4]))
@@ -129,7 +123,8 @@ def Main():
         cnt = sum/len(cellPts)
         sum = [0,0,0]
         if max<X+Y+Z:
-<<<<<<< HEAD
+            """
+        <<<<<<< HEAD
             myCell = cell(cellPts,[.75,.25,.75])
             for j in range(len(cellPts)):
                 if rs.IsPointInSurface(dump,cellPts[j]):
@@ -137,12 +132,11 @@ def Main():
             if keep==True:
                 members = myCell.genCell(attPts,thres,maxRatio)
         keep = False
-=======
+        ======="""
             myCell = cell(cellPts,[.5,0,.5])
             members = myCell.genCell(attPts,thres,maxRatio)
             #for j in range(len(members)):
             #    members[j] = rs.ScaleObjects(members[j],cnt,[1.25,1.25,1.25])
->>>>>>> b3ff1e34be6a6d2d1dc3dee068777df9876d85af
         cellPts = []
     return dim
 

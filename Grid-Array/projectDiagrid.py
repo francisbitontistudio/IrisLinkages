@@ -145,7 +145,7 @@ def collectIntersections(set,cuts):
             intersectPts.append(intersect[0][1])
     return intersectPts
 
-def createTiles(sets,cuts,structPts,perfPts,container,strength,height):
+def createTiles(sets,cuts,structPts,perfPts,container,strength,height,srf):
     pts = []
     myTiles = []
     profiles = []
@@ -165,36 +165,39 @@ def createTiles(sets,cuts,structPts,perfPts,container,strength,height):
             myTiles.append(tile([pts[i][j],pts[i+1][j],pts[i+1][j+1],pts[i][j+1]],minThick,height,division))
     for i in range(len(myTiles)):
         cntPt = myTiles[i].cntPt()
-        #if rs.IsPointInSurface(container,cntPt):
-        smallTiles = []
-        smallerTiles = []
-        smallPerf = []
-        valStruct = structAtt.collectVal(cntPt,0,1)
-        valPerf = perfAtt.collectVal(cntPt,minThick,maxThick)
-        factorStruct = r.random()
-        myTiles[i].thick = valPerf
-        if valStruct<factorStruct: 
-            smallTiles = myTiles[i].subDivGen(height)
-            if valStruct<factorStruct/2:
-                for k in range(len(smallTiles)):
-                    cntPt=smallTiles[k].cntPt()
-                    valStruct = structAtt.collectVal(cntPt,0,1)
-                    valPerf = perfAtt.collectVal(cntPt,minThick,maxThick)
-                    smallTiles[k].thick = valPerf
-                    factorStruct = r.random()
-                    if valStruct < factorStruct:
-                        rs.DeleteObjects(smallTiles[k].mesh)
-                        rs.DeleteObjects(myTiles[i].mesh)
-                        smallerTiles.extend(smallTiles[k].subDivGen(height))
-                    else:
-                        smallTiles[k].gen(False,False,True)
-        else:
-            myTiles[i].thick = .2
-            myTiles[i].gen(True,False,True)
+        
+        if rs.IsPointInSurface(container,cntPt):
+            smallTiles = []
+            smallerTiles = []
+            smallPerf = []
+            valStruct = structAtt.collectVal(cntPt,0,1)
+            valPerf = perfAtt.collectVal(cntPt,minThick,maxThick)
+            factorStruct = r.random()
+            myTiles[i].thick = valPerf
+            cntPt = myTiles.
+            if valStruct<factorStruct: 
+                smallTiles = myTiles[i].subDivGen(height)
+                if valStruct<factorStruct/2:
+                    for k in range(len(smallTiles)):
+                        cntPt=smallTiles[k].cntPt()
+                        valStruct = structAtt.collectVal(cntPt,0,1)
+                        valPerf = perfAtt.collectVal(cntPt,minThick,maxThick)
+                        smallTiles[k].thick = valPerf
+                        factorStruct = r.random()
+                        if valStruct < factorStruct:
+                            rs.DeleteObjects(smallTiles[k].mesh)
+                            rs.DeleteObjects(myTiles[i].mesh)
+                            smallerTiles.extend(smallTiles[k].subDivGen(height))
+                        else:
+                            smallTiles[k].gen(False,False,True)
+            else:
+                myTiles[i].thick = .2
+                myTiles[i].gen(True,False,True)
     return profiles
 
 def Main():
     crvs = rs.GetObjects("please select grid curves",rs.filter.curve)
+    polySrf = rs.GetObjects("please select geo",rs.filter.polysurface)
     refPt = rs.GetObject("please select reference pt",rs.filter.point)
     structPts = rs.GetObjects("please select structural Pts",rs.filter.point)
     perfPts = rs.GetObjects("please select perforationPts",rs.filter.point)

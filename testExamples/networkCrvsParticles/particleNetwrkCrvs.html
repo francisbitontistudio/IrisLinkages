@@ -87,29 +87,94 @@
          Grid Code Starts Here
          */
 
-        var vertex = [
-            new THREE.Vector3(0,0,0),
-            new THREE.Vector3(0,2,2),
-            new THREE.Vector3(0,0,5)
-        ];
-
+        var start = new THREE.Vector3(0,0,0);
         var X = 6;
         var Y = 6;
-        var subDiv = 12;
+        var Z = 6;
         var thres = 10;
         var gridCrvs = [];
-        var pts = [];
         var innerPts = [];
         var gridMat = new THREE.LineBasicMaterial({color:0x7777ff,linewidth:2});
-        var nextCrv = new THREE.Geometry();
-        var guide = new THREE.QuadraticBezierCurve3();
         var start = new THREE.Vector3(0,0,0);
         var mid = new THREE.Vector3(0,0,0);
         var end = new THREE.Vector3(0,0,0);
         var distance = new THREE.Vector3(0,0,0);
         var closePt = new THREE.Vector3(0,0,0);
 
+        
+        for(i=0;i<X;i++){
+            var geom = new THREE.Geometry();
+            var color = new THREE.Color(0x00ff00);
+            color.setHSL(color.getHSL().h,color.getHSL().s,color.getHSL().l+i);
+            var material = new THREE.PointCloudMaterial({size:4,color:color});
+            for (j = 0; j < Y; j++) {
+                for (k = 0; k < Z; k++) {
+                    var vec = new THREE.Vector3(i,j,k);
+                    vec.addVectors(vertex[0],vec)
+                    geom.vertices.push(vec);
+                }
+            }
+            scene.add(new THREE.PointCloud(geom, material))
+            gridCrvs.push(new THREE.PointCloud(geom,material));
+        }
+        
+        for (i=0;i<gridCrvs.length;i++){
+            scene.add(gridCrvs[i]);
+        }
+        
+        /*
+        for(i=0;i<gridCrvs.length;i++){
+            var validCrvs = [];
+            pts = gridCrvs[i].vertices;
+            for(j=0;j<pts.length;j++) {
+                validCrvs = [];
+                for(k=0;k<gridCrvs.length;k++) {
+                    if(i!=k){
+                        validCrvs.push(gridCrvs[k])
+                    }
+                }
+                closePt = pointClosestObj(validCrvs,pts[j])[1];
+                var vec = new THREE.Vector3(0,0,0);
+                vec.subVectors(closePt,pts[j]);
+                var dist = vec.length();
+                if(dist<thres){
+                    var draw = new THREE.Vector3(5,0,0);
+                    draw.subVectors(closePt,pts[j]);
+                    draw.multiplyScalar(.75);
+                    pts[j].add(draw);
+                }
+            }
+            //gridCrvs[i].vertices = pts;
+        }*/
 
+
+        function pointClosestPt(pts,point){
+            distance.subVectors(pts[0],point);
+            var dist = distance.length();
+            var min = dist;
+            var index = 0;
+            for(i=0;i<pts.length;i++){
+                distance.subVectors(pts[i],point);
+                dist = distance.length();
+                if(dist<min){
+                    min = dist;
+                    index = i;
+                }
+            }
+            return index;
+        }
+
+        function pointClosestObj(objs,point) {
+            var index = 0;
+            var objIndex = 0;
+            var pts = [];
+            for(i=0;i<objs.length;i++){
+                index = pointClosestPt(objs[i].vertices,point);
+                pts.push(objs[i].vertices[index]);
+            }
+            objIndex = pointClosestPt(pts,point);
+            return [objIndex,pts[objIndex]]
+        }
 
         function adjustSize(){
             camera.aspect = window.innerWidth/window.innerHeight;

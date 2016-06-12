@@ -114,10 +114,10 @@ def splitCrv(profile,splitters):
 
 def Main():
     profile = rs.GetObject("select profile",rs.filter.curve)
-    angX = rs.GetReal("enter angle of hatch in first direction (degrees)", -54)
+    angX = rs.GetReal("enter angle of hatch in first direction (degrees)", -45)
     angY = rs.GetReal("enter angle of hatch in second direction (degrees)", 45)
-    spacingX = rs.GetReal("enter desired spacing of hatch in first direction",.5)
-    spacingY = rs.GetReal("enter desired spacing of hatch in second direction",20)
+    spacingX = rs.GetReal("enter desired spacing of hatch in first direction",2)
+    spacingY = rs.GetReal("enter desired spacing of hatch in second direction",2)
     genHatchX(profile,angX,spacingX)
     genHatchY(profile,angY,spacingY)
 
