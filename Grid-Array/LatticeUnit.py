@@ -81,7 +81,7 @@ def Main():
     objs = rs.GetObjects("select objects")
     attPts = rs.GetObjects("select attPts",rs.filter.point)
     box = rs.BoundingBox(objs)
-    dim = 8
+    dim = 32
     X = rs.GetReal("please enter x axis spacing",rs.Distance(box[1],box[0]))
     Y = rs.GetReal("please enter y axis spacing",rs.Distance(box[0],box[3]))
     Z = rs.GetReal("please enter z axis spacing",rs.Distance(box[0],box[4]))

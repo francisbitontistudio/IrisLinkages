@@ -99,14 +99,14 @@ def Main():
     attPts = rs.GetObjects("select attPts",rs.filter.point)
     box = rs.BoundingBox(objs)
     dim = 6
-    nX = rs.GetInteger("please enter number in x" ,14)
-    nY = rs.GetInteger("please enter number in y",3)
-    nZ = rs.GetInteger("please enter number in z",6)
+    nX = rs.GetInteger("please enter number in x" ,42)
+    nY = rs.GetInteger("please enter number in y",20)
+    nZ = rs.GetInteger("please enter number in z",4)
     X = rs.GetReal("please enter x axis spacing",rs.Distance(box[1],box[0]))
     Y = rs.GetReal("please enter y axis spacing",rs.Distance(box[0],box[3]))
     Z = rs.GetReal("please enter z axis spacing",rs.Distance(box[0],box[4]))
     thres = rs.GetReal("please enter attractor strength",(X+Y+Z)/3*4)
-    maxRatio = rs.GetReal("please enter maximum ratio",.5)
+    maxRatio = rs.GetReal("please enter maximum ratio",.75)
     gridPts = grid(X,Y,Z,nX,nY,nZ)
     for i in range(len(gridPts)-dim*dim-1):
         keep = False
